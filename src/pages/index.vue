@@ -18,7 +18,7 @@ function remove() {
   reactPeople.value.splice(1, 1)
 }
 
-function mark() {
+function toggle() {
   for (const i of [0, 1]) {
     const elem = document.getElementById(prefixID + i)
     elem.children[1]?.classList.toggle('bg-green')
@@ -51,8 +51,8 @@ const { pause, resume } = useRafFn(() => {
   <button btn m-3 @click="remove">
     Remove second
   </button>
-  <button btn m-3 @click="mark">
-    Mark second
+  <button btn m-3 @click="toggle">
+    Toggle second
   </button>
   <br>
   List with :key="index"
