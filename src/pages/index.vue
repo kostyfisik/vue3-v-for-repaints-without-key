@@ -1,64 +1,56 @@
 <script setup lang="ts">
-import { useUserStore } from '~/stores/user'
+const people = [
+  { name: 'User 1', age: 20 },
+  { name: 'User 2', age: 30 },
+  { name: 'User 3', age: 40 },
+]
 
-const user = useUserStore()
-const name = $ref(user.savedName)
+const reactPeople = ref(people)
 
-const router = useRouter()
-const go = () => {
-  if (name)
-    router.push(`/hi/${encodeURIComponent(name)}`)
+function reset() {
+  reactPeople.value = [
+    { name: 'User 1', age: 20 },
+    { name: 'User 2', age: 30 },
+    { name: 'User 3', age: 40 },
+  ]
 }
 
-const { t } = useI18n()
+function remove() {
+  reactPeople.value.splice(1, 1)
+}
+
+let prevHTML = ''
+
+function logDomOnChange() {
+  const elem = document.getElementById('testList')
+  if (!elem)
+    return
+  if (prevHTML !== elem.innerHTML) {
+    console.log('========= OLD ==========', prevHTML)
+    console.log('    ===== NEW ==========', elem.innerHTML)
+    prevHTML = elem.innerHTML
+  }
+}
+
+const { pause, resume } = useRafFn(() => {
+  logDomOnChange()
+})
 </script>
 
 <template>
-  <div>
-    <div text-4xl>
-      <div i-carbon-campsite inline-block />
-    </div>
-    <p>
-      <a rel="noreferrer" href="https://github.com/antfu/vitesse" target="_blank">
-        Vitesse
-      </a>
-    </p>
-    <p>
-      <em text-sm opacity-75>{{ t('intro.desc') }}</em>
-    </p>
-
-    <div py-4 />
-
-    <input
-      id="input"
-      v-model="name"
-      :placeholder="t('intro.whats-your-name')"
-      :aria-label="t('intro.whats-your-name')"
-      type="text"
-      autocomplete="false"
-      p="x4 y2"
-      w="250px"
-      text="center"
-      bg="transparent"
-      border="~ rounded gray-200 dark:gray-700"
-      outline="none active:none"
-      @keydown.enter="go"
-    >
-    <label class="hidden" for="input">{{ t('intro.whats-your-name') }}</label>
-
-    <div>
-      <button
-        btn m-3 text-sm
-        :disabled="!name"
-        @click="go"
-      >
-        {{ t('button.go') }}
-      </button>
-    </div>
-  </div>
+  <button btn m-3 @click="reset">
+    Reset
+  </button>
+  <button btn m-3 @click="remove">
+    Remove second
+  </button>
+  <br>
+  List:
+  <br m-3>
+  <ul id="testList">
+    <li v-for="(person, index) in reactPeople" :key="index">
+      {{ person.name }} - {{index}}
+    </li>
+  </ul>
 </template>
 
-<route lang="yaml">
-meta:
-  layout: home
-</route>
